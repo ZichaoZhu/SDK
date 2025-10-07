@@ -1,26 +1,15 @@
 package main
+
 import (
-	"log"
-	"net/http"
 	"fmt"
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
-	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
-	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
+    "log"
+	"strconv"
+
+    "github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
+    "github.com/hyperledger/fabric-sdk-go/pkg/core/config"
+    "github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
 	"github.com/gin-gonic/gin"
 )
-
-type Car struct {
-	CarNumber string `json:"carnumber"`
-	Make   string `json:"make"`
-	Model  string `json:"model"`
-	Colour string `json:"colour"`
-	Owner  string `json:"owner"`
-}
-
-type QueryCarRequest struct {
-    CarNumber string `json:"carnumber"`
-}
-
 
 var (
 	SDK        *fabsdk.FabricSDK
@@ -32,6 +21,26 @@ var (
 	org1Peer0 = "peer0.org1.example.com"
 	org2Peer0 = "peer0.org2.example.com"
 )
+
+// student 结构体定义
+type Student struct {
+    School string `json:"school"`
+    Major  string `json:"major"`
+    Id     int    `json:"id"`
+    Name   string `json:"name"`
+    Owner  string `json:"owner"` // 创建者的唯一ID
+    Status string `json:"status"`// 状态: Pending, Approved, Rejected
+}
+
+// Invoke 是对 ChannelExecute 的简单封装，接受字符串参数切片
+func Invoke(funcName string, strArgs []string) (channel.Response, error) {
+    var byteArgs [][]byte
+    for _, a := range strArgs {
+        byteArgs = append(byteArgs, []byte(a))
+    }
+    return ChannelExecute(funcName, byteArgs)
+}
+
 func ChannelExecute(funcName string, args [][]byte)(channel.Response,error){
 	var err error
 	configPath := "./config.yaml"
@@ -53,53 +62,35 @@ func ChannelExecute(funcName string, args [][]byte)(channel.Response,error){
 	SDK.Close()
 	return response,nil
 }
+
 func main() {
 	r := gin.Default()
-	r.GET("/queryAllCars",func(c *gin.Context){
+
+	// addStudent
+	r.POST("/addStudent",func(c *gin.Context){
+		var student Student
+		c.BindJSON(&student)
 		var result channel.Response
-		result,err := ChannelExecute("queryAllCars",[][]byte{})
+		result, err := Invoke("addStudent", []string{
+			student.School,
+			student.Major,
+			strconv.Itoa(student.Id),
+			student.Name,
+		})
 		fmt.Println(result)
 		if err != nil{
 			log.Fatalf("Failed to evaluate transaction: %s\n", err)
 		}
-		c.JSON(http.StatusOK,gin.H{
+		c.JSON(200,gin.H{
 			"code" : "200",
-			"message" : "Query All Success",
+			"message" : "Add Student Success",
 			"result" : string(result.Payload),
 		})
 	})
 
-	r.POST("/createCar",func(c *gin.Context){
-		var car Car
-		c.BindJSON(&car)
-		var result channel.Response
-		result,err := ChannelExecute("CreateCar",[][]byte{[]byte(car.CarNumber),[]byte(car.Make),[]byte(car.Model),[]byte(car.Colour),[]byte(car.Owner)})
-		fmt.Println(result)
-		if err != nil{
-			log.Fatalf("Failed to evaluate transaction: %s\n", err)
-		}
-		c.JSON(http.StatusOK,gin.H{
-			"code" : "200",
-			"message" : "Create Success",
-			"result" : string(result.Payload),
-		})
-	})
 
-	r.POST("/QueryCar",func(c *gin.Context){
-		var req QueryCarRequest
-		c.BindJSON(&req)
-		var result channel.Response
-		result,err := ChannelExecute("QueryCar",[][]byte{[]byte(req.CarNumber)})
-		fmt.Println(result)
-		if err != nil{
-			log.Fatalf("Failed to evaluate transaction: %s\n", err)
-		}
-		c.JSON(http.StatusOK,gin.H{
-			"code" : "200",
-			"message" : "Query Success",
-			"result" : string(result.Payload),
-		})
-	})
+
+
 
 
 	r.Run(":9099")

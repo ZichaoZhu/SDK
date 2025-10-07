@@ -182,17 +182,17 @@ peers:
 entitymatchers:
   peer:
   - pattern: (\w*)peer0.org1.example.com(\w*)
-    urlsubstitutionexp: 192.168.85.128:7051
+    urlsubstitutionexp: 192.168.175.128:7051
     ssltargetoverrideurlsubstitutionexp: peer0.org1.example.com
     mappedhost: peer0.org1.example.com
   - pattern: (\w*)peer0.org2.example.com(\w*)
-    urlsubstitutionexp: 192.168.85.128:9051
+    urlsubstitutionexp: 192.168.175.128:9051
     ssltargetoverrideurlsubstitutionexp: peer0.org2.example.com
     mappedhost: peer0.org2.example.com
 
   orderer:
   - pattern: (\w*)orderer.example.com(\w*)
-    urlsubstitutionexp: 192.168.85.128:7050
+    urlsubstitutionexp: 192.168.175.128:7050
     ssltargetoverrideurlsubstitutionexp: orderer.example.com
     mappedhost: orderer.example.com
 
