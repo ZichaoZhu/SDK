@@ -32,6 +32,12 @@ echo -e "\n\nQuerying grade..."
 curl -X POST http://localhost:9099/queryGrade -H "Content-Type: application/json" -d '{"school":"S1","studentId":1001,"courseId":"OS101","year":2024,"semester":1}'
 
 ## addPrice
+echo -e "\n\nAdding price..."
 curl -X POST http://localhost:9099/addPrice \
   -H "Content-Type: application/json" \
   -d '{"school":"S1","studentId":1001,"name":"ACM奖","id":"P001","year":2024,"level":"National","institution":"ACM"}'
+
+## validatePrice
+echo -e "\n\nValidating price..."
+curl -X POST http://localhost:9099/validatePrice -H "Content-Type:
+    application/json" -d '{"school":"S1","studentId":1001,"priceId":"P001","year":2024,"newStatus":"Approved"}'
