@@ -47,6 +47,16 @@ type Grade struct {
     Status      string  `json:"status"`
 }
 
+// validateGradeReq 结构体定义
+type ValidateGradeReq struct {
+	School    string `json:"school" binding:"required"`
+	StudentID int    `json:"studentId" binding:"required"`
+	CourseID  string `json:"courseId" binding:"required"`
+	Year      int    `json:"year" binding:"required"`
+	Semester  int    `json:"semester" binding:"required"`
+	NewStatus string `json:"newStatus" binding:"required"`
+}
+
 // validateStudentReq 结构体定义
 type ValidateStudentReq struct {
 	School    string `json:"school" binding:"required"`
@@ -195,6 +205,30 @@ func main() {
 		})
 	})
 
+	// validateGrade
+	r.POST("/validateGrade", func(c *gin.Context) {
+		var req ValidateGradeReq
+		if err := c.BindJSON(&req); err != nil {
+			c.JSON(400, gin.H{"code":400,"error":err.Error()}); return
+		}
+		resp, err := Invoke("validateGrade", []string{
+			req.School,
+			strconv.Itoa(req.StudentID),
+			req.CourseID,
+			strconv.Itoa(req.Year),
+			strconv.Itoa(req.Semester),
+			req.NewStatus,
+		})
+		if err != nil {
+			c.JSON(400, gin.H{"code":400,"error":err.Error()}); return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"code":    200,
+			"message": "validateGrade success",
+			"result":  string(resp.Payload),
+		})
+	})
+	
 
 
 	r.Run(":9099")
