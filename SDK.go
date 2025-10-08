@@ -82,6 +82,15 @@ type AddGradeReq struct {
     Semester   int     `json:"semester" binding:"required"`
 }
 
+// queryGradeReq 结构体定义
+type QueryGradeReq struct {
+	School    string `json:"school" binding:"required"`
+	StudentID int    `json:"studentId" binding:"required"`
+	CourseID  string `json:"courseId" binding:"required"`
+	Year      int    `json:"year" binding:"required"`
+	Semester  int    `json:"semester" binding:"required"`
+}
+
 // Invoke 是对 ChannelExecute 的简单封装，接受字符串参数切片
 func Invoke(funcName string, strArgs []string) (channel.Response, error) {
     var byteArgs [][]byte
@@ -229,6 +238,28 @@ func main() {
 		})
 	})
 	
+	// QueryGrade
+	r.POST("/queryGrade", func(c *gin.Context) {
+		var req QueryGradeReq
+		if err := c.BindJSON(&req); err != nil {
+			c.JSON(400, gin.H{"code":400,"error":err.Error()}); return
+		}
+		resp, err := Invoke("queryGrade", []string{
+			req.School,
+			strconv.Itoa(req.StudentID),
+			req.CourseID,
+			strconv.Itoa(req.Year),
+			strconv.Itoa(req.Semester),
+		})
+		if err != nil {
+			c.JSON(400, gin.H{"code":400,"error":err.Error()}); return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"code":    200,
+			"message": "queryGrade success",
+			"result":  string(resp.Payload),
+		})
+	})
 
 
 	r.Run(":9099")

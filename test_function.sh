@@ -18,7 +18,15 @@ curl -X POST http://localhost:9099/queryStudent -H "Content-Type: application/js
 echo -e "\n\nAdding grade..."
 curl -X POST http://localhost:9099/addGrade -H "Content-Type: application/json" -d '{"courseName":"OS","courseId":"OS101",    "teacher":"Zhang","school":"S1","studentId":1001,"year":2024,    "score":95.5,"semester":1}'
 
+## queryGrade:
+echo -e "\n\nQuerying grade..."
+curl -X POST http://localhost:9099/queryGrade -H "Content-Type: application/json" -d '{"school":"S1","studentId":1001,"courseId":"OS101","year":2024,"semester":1}'
+
 ## validateGrade:
 echo -e "\n\nValidating grade..."
 curl -X POST http://localhost:9099/validateGrade -H "Content-Type:
     application/json" -d '{"school":"S1","studentId":1001,"courseId":"OS101","year":2024,"semester":1,"newStatus":"Approved"}'
+
+## queryGrade:
+echo -e "\n\nQuerying grade..."
+curl -X POST http://localhost:9099/queryGrade -H "Content-Type: application/json" -d '{"school":"S1","studentId":1001,"courseId":"OS101","year":2024,"semester":1}'
