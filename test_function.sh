@@ -37,7 +37,15 @@ curl -X POST http://localhost:9099/addPrice \
   -H "Content-Type: application/json" \
   -d '{"school":"S1","studentId":1001,"name":"ACM奖","id":"P001","year":2024,"level":"National","institution":"ACM"}'
 
+## queryPrice
+echo -e "\n\nQuerying price..."
+curl -X POST http://localhost:9099/queryPrice -H "Content-Type: application/json" -d '{"priceId":"P001"}'
+
 ## validatePrice
 echo -e "\n\nValidating price..."
 curl -X POST http://localhost:9099/validatePrice -H "Content-Type:
     application/json" -d '{"school":"S1","studentId":1001,"priceId":"P001","year":2024,"newStatus":"Approved"}'
+
+## queryPrice
+echo -e "\n\nQuerying price..."
+curl -X POST http://localhost:9099/queryPrice -H "Content-Type: application/json" -d '{"priceId":"P001"}'

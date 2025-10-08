@@ -109,6 +109,11 @@ type ValidatePriceReq struct {
 	NewStatus string `json:"newStatus" binding:"required"`
 }
 
+// queryPriceReq 结构体定义
+type QueryPriceReq struct {
+	PriceID   string `json:"priceId" binding:"required"`
+}
+
 // Invoke 是对 ChannelExecute 的简单封装，接受字符串参数切片
 func Invoke(funcName string, strArgs []string) (channel.Response, error) {
     var byteArgs [][]byte
@@ -320,6 +325,25 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{
 			"code":    200,
 			"message": "validatePrice success",
+			"result":  string(resp.Payload),
+		})
+	})
+
+	// queryPrice
+	r.POST("/queryPrice", func(c *gin.Context) {
+		var req QueryPriceReq
+		if err := c.BindJSON(&req); err != nil {
+			c.JSON(400, gin.H{"code":400,"error":err.Error()}); return
+		}
+		resp, err := Invoke("queryPrice", []string{
+			req.PriceID,
+		})
+		if err != nil {
+			c.JSON(400, gin.H{"code":400,"error":err.Error()}); return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"code":    200,
+			"message": "queryPrice success",
 			"result":  string(resp.Payload),
 		})
 	})
