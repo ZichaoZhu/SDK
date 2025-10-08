@@ -91,6 +91,18 @@ type QueryGradeReq struct {
 	Semester  int    `json:"semester" binding:"required"`
 }
 
+// addPriceReq 结构体定义
+type addPriceReq struct {
+    School      string `json:"school" binding:"required"`
+    StudentID   int    `json:"studentId" binding:"required"`
+    Name        string `json:"name" binding:"required"`   // prizeName
+    Id          string `json:"id" binding:"required"`     // prizeId
+    Year        int    `json:"year" binding:"required"`
+    Level       string `json:"level" binding:"required"`
+    Institution string `json:"institution" binding:"required"`
+    // Owner/Status 不从前端传（链码内部或后续审批）
+}
+
 // Invoke 是对 ChannelExecute 的简单封装，接受字符串参数切片
 func Invoke(funcName string, strArgs []string) (channel.Response, error) {
     var byteArgs [][]byte
@@ -257,6 +269,31 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{
 			"code":    200,
 			"message": "queryGrade success",
+			"result":  string(resp.Payload),
+		})
+	})
+
+	// addPrice
+	r.POST("/addPrice", func(c *gin.Context) {
+		var req addPriceReq
+		if err := c.BindJSON(&req); err != nil {
+			c.JSON(400, gin.H{"code":400,"error":err.Error()}); return
+		}
+		resp, err := Invoke("addPrice", []string{
+			req.School,
+			strconv.Itoa(req.StudentID),
+			req.Name,
+			req.Id,
+			strconv.Itoa(req.Year),
+			req.Level,
+			req.Institution,
+		})
+		if err != nil {
+			c.JSON(400, gin.H{"code":400,"error":err.Error()}); return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"code":    200,
+			"message": "addPrice success",
 			"result":  string(resp.Payload),
 		})
 	})
