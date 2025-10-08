@@ -4,7 +4,6 @@ import (
 	"fmt"
     "log"
 	"strconv"
-	"net/http"
 
     "github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
     "github.com/hyperledger/fabric-sdk-go/pkg/core/config"
@@ -33,11 +32,28 @@ type Student struct {
     Status string `json:"status"`// 状态: Pending, Approved, Rejected
 }
 
-// validateStudentReq 结构体定义
-type ValidateStudentReq struct {
-	School    string `json:"school" binding:"required"`
-	StudentID int    `json:"studentId" binding:"required"`
-	NewStatus string `json:"newStatus" binding:"required"`
+// ValidateGradeReq 结构体定义
+type ValidateGradeReq struct {
+    School    string `json:"school" binding:"required"`
+    StudentID int    `json:"studentId" binding:"required"`
+    NewStatus string `json:"newStatus" binding:"required"`
+}
+
+// AddGradeReq 结构体定义
+type AddPriceReq struct {
+    School      string `json:"school" binding:"required"`
+    StudentID   int    `json:"studentId" binding:"required"`
+    PrizeName   string `json:"prizeName" binding:"required"`
+    PrizeID     string `json:"prizeId" binding:"required"`
+    Year        int    `json:"year" binding:"required"`
+    Level       string `json:"level" binding:"required"`
+    Institution string `json:"institution" binding:"required"`
+}
+
+// ValidatePriceReq 结构体定义
+type ValidatePriceReq struct {
+    PriceID   string `json:"priceId" binding:"required"`
+    NewStatus string `json:"newStatus" binding:"required"`
 }
 
 // Invoke 是对 ChannelExecute 的简单封装，接受字符串参数切片
@@ -89,7 +105,7 @@ func main() {
 		if err != nil{
 			log.Fatalf("Failed to evaluate transaction: %s\n", err)
 		}
-		c.JSON(http.StatusOK,gin.H{
+		c.JSON(200,gin.H{
 			"code" : "200",
 			"message" : "Add Student Success",
 			"result" : string(result.Payload),
