@@ -33,6 +33,20 @@ type Student struct {
     Status string `json:"status"`// 状态: Pending, Approved, Rejected
 }
 
+// grade 结构体定义
+type Grade struct {
+    Course_name string  `json:"course"`
+    Course_id   string  `json:"courseId"`
+    Teacher     string  `json:"teacher"`
+    School      string  `json:"school"`
+    Student_id  int     `json:"studentId"`
+    Year        int     `json:"year"`
+    Semester    int     `json:"semester"`
+    Score       float64 `json:"score"`
+    Owner       string  `json:"owner"`
+    Status      string  `json:"status"`
+}
+
 // validateStudentReq 结构体定义
 type ValidateStudentReq struct {
 	School    string `json:"school" binding:"required"`
@@ -157,29 +171,29 @@ func main() {
 
 	// addGrade
 	r.POST("/addGrade", func(c *gin.Context) {
-		var req AddGradeReq
-		if err := c.ShouldBindJSON(&req); err != nil {
-			c.JSON(400, gin.H{"code":400,"error":err.Error()})
-			return
-		}
-		resp, err := Invoke("addGrade", []string{
-			req.CourseName,
-			req.CourseID,
-			req.Teacher,
-			req.School,
-			strconv.Itoa(req.StudentID),
-			strconv.Itoa(req.Year),
-			fmt.Sprintf("%v", req.Score),
-			strconv.Itoa(req.Semester),
+		var grade Grade
+		c.BindJSON(&grade)
+		var result channel.Response
+		result, err := Invoke("addGrade", []string{
+			grade.Course_name,
+			grade.Course_id,
+			grade.Teacher,
+			grade.School,
+			strconv.Itoa(grade.Student_id),
+			strconv.Itoa(grade.Year),
+			fmt.Sprintf("%f", grade.Score),
+			strconv.Itoa(grade.Semester),
 		})
-		if err != nil {
-			c.JSON(400, gin.H{"code":400,"error":err.Error()})
-			return
+		fmt.Println(result)
+		if err != nil{
+			log.Fatalf("Failed to evaluate transaction: %s\n", err)
 		}
-		c.JSON(200, gin.H{"code":200,"message":"addGrade success","result":string(resp.Payload)})
+		c.JSON(http.StatusOK,gin.H{
+			"code" : "200",
+			"message" : "Add Grade Success",
+			"result" : string(result.Payload),
+		})
 	})
-
-
 
 
 
