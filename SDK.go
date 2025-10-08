@@ -40,6 +40,12 @@ type ValidateStudentReq struct {
 	NewStatus string `json:"newStatus" binding:"required"`
 }
 
+// queryStudentReq 结构体定义
+type QueryStudentReq struct {
+	School    string `json:"school" binding:"required"`
+	StudentID int    `json:"studentId" binding:"required"`
+}
+
 // Invoke 是对 ChannelExecute 的简单封装，接受字符串参数切片
 func Invoke(funcName string, strArgs []string) (channel.Response, error) {
     var byteArgs [][]byte
@@ -117,8 +123,25 @@ func main() {
     	})
 	})
 
-
-
+	// queryStudent
+	r.POST("/queryStudent", func(c *gin.Context) {
+		var req QueryStudentReq
+		if err := c.BindJSON(&req); err != nil {
+			c.JSON(400, gin.H{"code":400,"error":err.Error()}); return
+		}
+		resp, err := Invoke("queryStudent", []string{
+			req.School,
+			strconv.Itoa(req.StudentID),
+		})
+		if err != nil {
+			c.JSON(400, gin.H{"code":400,"error":err.Error()}); return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"code":    200,
+			"message": "queryStudent success",
+			"result":  string(resp.Payload),
+		})
+	})
 
 
 
